@@ -1,0 +1,62 @@
+namespace: demo-app
+
+replicaCount: 2
+
+image:
+  repository: hayetderdour/k8s-demo-app
+  tag: latest
+  pullPolicy: IfNotPresent
+
+config:
+  APP_NAME: "MyApp K8s Demo Helm"
+  APP_ENV: "demo helm"
+  APP_VERSION: "2.0.0"
+  LOG_LEVEL: "INFO"
+  STORAGE_PATH: "/data"
+  FEATURE_UPLOAD_ENABLED: "true"
+  PORT: "3000"
+
+secret:
+  APP_SECRET: "U2VjcmV0S2V5SGF5ZXQyMDI2IQ=="
+  ADMIN_PASSWORD: "QWRtaW5QYXNzSGF5ZXQyMDI2IQ=="
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 3000
+
+ingress:
+  enabled: true
+  className: nginx
+  host: demo.local
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 256Mi
+
+probes:
+  liveness:
+    path: /health
+    port: 3000
+  readiness:
+    path: /health
+    port: 3000
+
+persistence:
+  enabled: true
+  storageClassName: demo-storage
+  size: 1Gi
+  hostPath: /tmp/demo-app-data
+
+autoscaling:
+  enabled: false
+  minReplicas: 2
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 70
+
+networkPolicy:
+  enabled: false

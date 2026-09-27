@@ -1,0 +1,10 @@
+Application {{ .Chart.Name }} deployee avec succes (release "{{ .Release.Name }}") !
+Namespace : {{ .Values.namespace }}
+
+Acces via Ingress :
+  http://{{ .Values.ingress.host }}
+  (verifie que "{{ .Values.ingress.host }}" pointe vers l'IP de ton cluster dans /etc/hosts)
+
+Verifie l'etat du deploiement avec :
+  kubectl get all -n {{ .Values.namespace }}
+  kubectl get pvc -n {{ .Values.namespace }}

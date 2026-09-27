@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: demo-mypv
+  labels:
+    app: k8s-demo
+    type: local
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /tmp/demo-app-data
+    type: DirectoryOrCreate
+  storageClassName: demo-storage
+  persistentVolumeReclaimPolicy: Retain

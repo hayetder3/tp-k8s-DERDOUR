@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-app-deployment
+  namespace: demo-app
+  labels:
+    app: k8s-demo
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: k8s-demo
+  template:
+    metadata:
+      labels:
+        app: k8s-demo
+    spec:
+      restartPolicy: Always
+      initContainers:
+        - name: fix-permissions
+          image: busybox
+          command: ["sh", "-c", "chown -R 1000:1000 /data && chmod -R 777 /data"]
+          volumeMounts:
+            - name: demo-mypvc
+              mountPath: /data
+      containers:
+        - name: demo-app
+          image: hayetderdour/k8s-demo-app:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3000
+          envFrom:
+            - configMapRef:
+                name: demo-app-config
+          env:
+            - name: APP_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: demo-app-secret
+                  key: APP_SECRET
+            - name: ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: demo-app-secret
+                  key: ADMIN_PASSWORD
+          volumeMounts:
+            - name: demo-mypvc
+              mountPath: /data
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+      volumes:
+        - name: demo-mypvc
+          persistentVolumeClaim:
+            claimName: demo-mypvc

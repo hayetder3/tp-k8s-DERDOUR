@@ -1,0 +1,9 @@
+apiVersion: v2
+name: demo-app
+description: Un Helm chart pour le deploiement de la demo-app
+type: application
+version: 2.1.0
+appVersion: "2.0.0"
+maintainers:
+  - name: Hayet Derdour
+    email: derdourhayet@gmail.com
